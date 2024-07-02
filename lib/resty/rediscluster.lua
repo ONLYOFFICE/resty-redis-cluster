@@ -190,7 +190,7 @@ local function try_hosts_slots(self, serv_list)
             else
                 table_insert(errors, nerr)
             end
-            release_connection(redis_client, config)
+            --release_connection(redis_client, config)
 
             -- refresh of slots and master nodes successful
             -- not required to connect/iterate over additional hosts
@@ -486,7 +486,7 @@ local function handle_command_with_retry(self, target_ip, target_port, asking, c
                 if string.sub(err, 1, 5) == "MOVED" then
                     --ngx.log(ngx.NOTICE, "find MOVED signal, trigger retry for normal commands, cmd:" .. cmd .. " key:" .. key)
                     --if retry with moved, we will not asking to specific ip,port anymore
-                    release_connection(redis_client, config)
+                    --release_connection(redis_client, config)
                     target_ip = nil
                     target_port = nil
                     self:refresh_slots()
@@ -494,7 +494,7 @@ local function handle_command_with_retry(self, target_ip, target_port, asking, c
 
                 elseif string.sub(err, 1, 3) == "ASK" then
                     --ngx.log(ngx.NOTICE, "handle asking for normal commands, cmd:" .. cmd .. " key:" .. key)
-                    release_connection(redis_client, config)
+                    --release_connection(redis_client, config)
                     if asking then
                         --Should not happen after asking target ip,port and still return ask, if so, return error.
                         return nil, "nested asking redirection occurred, client cannot retry "
@@ -517,7 +517,7 @@ local function handle_command_with_retry(self, target_ip, target_port, asking, c
                 end
             end
             if not need_to_retry then
-                release_connection(redis_client, config)
+                --release_connection(redis_client, config)
                 return res, err
             end
         else
@@ -556,7 +556,7 @@ local function _do_cmd_master(self, cmd, key, ...)
         if err then
             table_insert(errors, err)
         end
-        release_connection(redis_client, self.config)
+        --release_connection(redis_client, self.config)
     end
     return #errors == 0, table.concat(errors, ";")
 end
@@ -744,7 +744,7 @@ function _M.commit_pipeline(self)
             if has_cluster_fail_signal_in_pipeline(res) then
                 return nil, "Cannot executing pipeline command, cluster status is failed!"
             end
-            release_connection(redis_client, config)
+            --release_connection(redis_client, config)
             node_res_map[k] = res
         else
             --There might be node fail, we should also refresh slot cache
